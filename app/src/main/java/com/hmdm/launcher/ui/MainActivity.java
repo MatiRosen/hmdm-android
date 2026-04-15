@@ -403,6 +403,20 @@ public class MainActivity
         settingsHelper = SettingsHelper.getInstance(this);
         preferences = getSharedPreferences(Const.PREFERENCES, MODE_PRIVATE);
 
+        // Apply configuration from intent extras (used by MDM Enrollment Tool)
+        if (intent != null) {
+            String extraBaseUrl = intent.getStringExtra("baseUrl");
+            String extraDeviceId = intent.getStringExtra("deviceId");
+            if (extraBaseUrl != null && !extraBaseUrl.isEmpty()) {
+                Log.d(Const.LOG_TAG, "Setting baseUrl from intent: " + extraBaseUrl);
+                settingsHelper.setBaseUrl(extraBaseUrl);
+            }
+            if (extraDeviceId != null && !extraDeviceId.isEmpty()) {
+                Log.d(Const.LOG_TAG, "Setting deviceId from intent: " + extraDeviceId);
+                settingsHelper.setDeviceId(extraDeviceId);
+            }
+        }
+
         configUpdater = new ConfigUpdater(this);
 
         if ("".equals(settingsHelper.getDeviceId()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
