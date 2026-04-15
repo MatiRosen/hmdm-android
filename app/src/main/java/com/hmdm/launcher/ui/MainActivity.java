@@ -403,6 +403,24 @@ public class MainActivity
         settingsHelper = SettingsHelper.getInstance(this);
         preferences = getSharedPreferences(Const.PREFERENCES, MODE_PRIVATE);
 
+        // Allow pre-configuring server URL and device ID via intent extras.
+        // This enables automated enrollment tools to launch Headwind with
+        // configuration already set, skipping manual input on the setup screen.
+        // Usage: adb shell am start -n com.hmdm.launcher/.ui.MainActivity \
+        //          --es baseUrl "https://your-server.com" --es deviceId "your-device-id"
+        if (intent != null) {
+            String extraBaseUrl = intent.getStringExtra("baseUrl");
+            String extraDeviceId = intent.getStringExtra("deviceId");
+            if (extraBaseUrl != null && !extraBaseUrl.isEmpty()) {
+                Log.d(Const.LOG_TAG, "Setting baseUrl from intent extra: " + extraBaseUrl);
+                settingsHelper.setBaseUrl(extraBaseUrl);
+            }
+            if (extraDeviceId != null && !extraDeviceId.isEmpty()) {
+                Log.d(Const.LOG_TAG, "Setting deviceId from intent extra: " + extraDeviceId);
+                settingsHelper.setDeviceId(extraDeviceId);
+            }
+        }
+
         configUpdater = new ConfigUpdater(this);
 
         if ("".equals(settingsHelper.getDeviceId()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
